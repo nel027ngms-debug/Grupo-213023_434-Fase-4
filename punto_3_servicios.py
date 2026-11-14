@@ -256,8 +256,8 @@ class Reserva(EntidadGeneral):
 
         logging.info(
             f"Reserva {self.id_entidad} creada correctamente."
-        )
-
+    
+    
     # ==========================================
     # 4.3. ENCAPSULACIÓN MEDIANTE PROPIEDADES
     # ==========================================
@@ -277,3 +277,135 @@ class Reserva(EntidadGeneral):
     @property
     def estado(self):
         return self._estado
+)
+
+
+# ==========================================
+    # 4.4. MÉTODO PARA CONFIRMAR LA RESERVA
+    # ==========================================
+
+    def confirmar(self):
+        """
+        Cambia el estado de la reserva de Pendiente
+        a Confirmada.
+        """
+        try:
+            if self._estado != "Pendiente":
+                raise ReservaError(
+                    "Solo se pueden confirmar reservas pendientes."
+                )
+
+            self._estado = "Confirmada"
+
+            logging.info(
+                f"Reserva {self.id_entidad} confirmada correctamente."
+            )
+
+            return "Reserva confirmada exitosamente."
+
+        except ReservaError as error:
+            logging.error(f"Error al confirmar reserva: {error}")
+            raise
+
+        except Exception as error:
+            logging.exception("Error inesperado al confirmar la reserva.")
+            raise ReservaError(
+                "No fue posible confirmar la reserva."
+            ) from error
+
+    # ==========================================
+    # 4.5. MÉTODO PARA CANCELAR LA RESERVA
+    # ==========================================
+
+    def cancelar(self):
+        """
+        Permite cancelar una reserva que se encuentre
+        pendiente o confirmada.
+        """
+        try:
+            if self._estado not in ("Pendiente", "Confirmada"):
+                raise ReservaError(
+                    "No se puede cancelar una reserva procesada o cancelada."
+                )
+
+            self._estado = "Cancelada"
+
+            logging.info(
+                f"Reserva {self.id_entidad} cancelada correctamente."
+            )
+
+            return "Reserva cancelada exitosamente."
+
+        except ReservaError as error:
+            logging.error(f"Error al cancelar reserva: {error}")
+            raise
+
+        except Exception as error:
+            logging.exception("Error inesperado al cancelar la reserva.")
+            raise ReservaError(
+                "No fue posible cancelar la reserva."
+            ) from error
+
+    # ==========================================
+    # 4.6. MÉTODO PARA PROCESAR LA RESERVA
+    # ==========================================
+
+    def procesar(self):
+        """
+        Procesa una reserva confirmada, valida los parámetros
+        del servicio y calcula su costo correspondiente.
+        """
+        try:
+            # Verificar que la reserva esté confirmada
+            if self._estado != "Confirmada":
+                raise ReservaError(
+                    "La reserva debe estar confirmada para procesarse."
+                )
+
+            # Validar los parámetros del servicio
+            if not self._servicio.validar_parametros():
+                raise ReservaError(
+                    "Los parámetros del servicio no son válidos."
+                )
+
+            # Calcular el costo mediante polimorfismo
+            costo = self._servicio.calcular_costo()
+
+            # Actualizar el estado de la reserva
+            self._estado = "Procesada"
+
+            logging.info(
+                f"Reserva {self.id_entidad} procesada correctamente. "
+                f"Costo total: ${costo}"
+            )
+
+            return costo
+
+        except ReservaError as error:
+            logging.error(f"Error al procesar reserva: {error}")
+            raise
+
+        except Exception as error:
+            logging.exception(
+                "Error inesperado durante el procesamiento."
+            )
+            raise ReservaError(
+                "No fue posible procesar la reserva."
+            ) from error
+
+    # ==========================================
+    # 4.7. IMPLEMENTACIÓN DEL MÉTODO ABSTRACTO
+    # ==========================================
+
+    def obtener_detalles(self) -> str:
+        """
+        Retorna la información completa de la reserva.
+        """
+        return (
+            f"Reserva ID: {self.id_entidad}\n"
+            f"Cliente: {self._cliente.nombre}\n"
+            f"Servicio: {self._servicio.nombre_servicio}\n"
+            f"Duración: {self._duracion}\n"
+            f"Estado: {self._estado}"
+        )
+
