@@ -188,3 +188,92 @@ class ServicioAlimentacion(Servicio):
             f"Personas: {self._personas} |"
             f"Costo por persona: ${self._costo_persona}"
         )
+        
+
+# ==========================================
+# 4. CLASE RESERVA (Hereda de EntidadGeneral)
+# ==========================================
+
+import logging
+
+# Configuración del archivo para registrar eventos y errores
+logging.basicConfig(
+    filename="registro_reservas.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+
+# ==========================================
+# 4.1. EXCEPCIÓN PERSONALIZADA PARA RESERVAS
+# ==========================================
+
+class ReservaError(Exception):
+    """
+    Excepción personalizada para controlar errores
+    relacionados con la creación y gestión de reservas.
+    """
+    pass
+
+
+# ==========================================
+# 4.2. CLASE RESERVA
+# ==========================================
+
+class Reserva(EntidadGeneral):
+    """
+    Clase que representa una reserva dentro del sistema.
+    Integra un cliente, un servicio, duración y estado.
+    Implementa confirmación, cancelación y procesamiento
+    mediante el manejo de excepciones.
+    """
+
+    def __init__(self, id_reserva: str, cliente: Cliente,
+                 servicio: Servicio, duracion: int):
+
+        # Inicializar los atributos de la clase padre
+        super().__init__(id_reserva)
+
+        # Validar la información del cliente
+        if not isinstance(cliente, Cliente):
+            raise ValueError("Debe proporcionar un cliente válido.")
+
+        # Validar la información del servicio
+        if not isinstance(servicio, Servicio):
+            raise ValueError("Debe proporcionar un servicio válido.")
+
+        # Validar la duración de la reserva
+        if (isinstance(duracion, bool)
+                or not isinstance(duracion, int)
+                or duracion <= 0):
+            raise ValueError("La duración debe ser un número entero positivo.")
+
+        # Atributos encapsulados de la reserva
+        self._cliente = cliente
+        self._servicio = servicio
+        self._duracion = duracion
+        self._estado = "Pendiente"
+
+        logging.info(
+            f"Reserva {self.id_entidad} creada correctamente."
+        )
+
+    # ==========================================
+    # 4.3. ENCAPSULACIÓN MEDIANTE PROPIEDADES
+    # ==========================================
+
+    @property
+    def cliente(self):
+        return self._cliente
+
+    @property
+    def servicio(self):
+        return self._servicio
+
+    @property
+    def duracion(self):
+        return self._duracion
+
+    @property
+    def estado(self):
+        return self._estado
