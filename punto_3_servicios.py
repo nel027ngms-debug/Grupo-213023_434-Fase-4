@@ -3,6 +3,10 @@
 UNIVERSIDAD NACIONAL ABIERTA Y A DISTANCIA (UNAD)
 Escuela de Ciencias Básicas, Tecnología e Ingeniería (ECBTI)
 Curso: Programación (Código: 213023)
+Integrantes:
+-Verónica Sánchez Cabrera
+-Francisco Javier Lozano Yara
+-Nelson Geovanny Medina Sedano
 Fase 4 - Prácticas Simuladas: Componente Práctico
 Empresa: Software FJ - Sistema Integral de Gestión
 Grupo: 213023_434
