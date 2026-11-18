@@ -41,7 +41,13 @@ class DatosInvalidosError(ErrorSistemaFJ):
 class ReservaError(ErrorSistemaFJ):
     """Excepción lanzada ante operaciones no permitidas o fallos en las reservas."""
     pass
-
+#==========================================
+#REGISTRO GLOBAL DE ERRORES
+#==========================================
+def registrar_error(error):
+    logging.exception(
+        f"ERROR CRÍTICO: {type(error).__name__} - {error}"
+    )
 
 # ==========================================
 # 1. CLASE ABSTRACTA BASE (EntidadGeneral)
@@ -88,13 +94,20 @@ class Cliente(EntidadGeneral):
         super().__init__(id_cliente)
 
         # Validaciones estrictas de los datos personales
-        if not nombre or not isinstance(nombre, str) or len(nombre.strip()) < 3:
-            raise DatosInvalidosError("El nombre del cliente debe ser texto y tener al menos 3 caracteres.")
-        if not isinstance(correo, str) or "@" not in correo or "." not in correo:
-            raise DatosInvalidosError("El correo electrónico proporcionado no tiene un formato válido.")
-        if not isinstance(telefono, str) or not telefono.isdigit() or len(telefono) < 7:
-            raise DatosInvalidosError("El teléfono debe contener solo números y tener mínimo 7 dígitos.")
-
+        try:
+            if not nombre or not isinstance(nombre, str) or len(nombre.strip()) < 3:
+                logging.error(f"Nombre invalido para ciente: {nombre}")
+                raise DatosInvalidosError("El nombre del cliente debe ser texto y tener al menos 3 caracteres.")
+            if not isinstance(correo, str) or "@" not in correo or "." not in correo:
+                logging.error(f"Correo invaido: {correo}")
+                raise DatosInvalidosError("El correo electrónico proporcionado no tiene un formato válido.")
+            if not isinstance(telefono, str) or not telefono.isdigit() or len(telefono) < 7:
+                logging.error(f"Número telefonico invalido")
+                raise DatosInvalidosError("El teléfono debe contener solo números y tener mínimo 7 dígitos.")
+        except Exception as e:
+            logging.exception("Error al crear cliente")
+            raise
+        
         # Encapsulación de atributos privados
         self._nombre = nombre.strip()
         self._correo = correo.strip()
@@ -154,9 +167,12 @@ class Servicio(EntidadGeneral):
     def disponible(self, estado: bool):
         """Permite cambiar la disponibilidad del servicio validando que sea booleano."""
         if not isinstance(estado, bool):
+            logging.error(f"Disponibilidad invalida para servicio {self.id_entidad}")
             raise DatosInvalidosError("La disponibilidad debe ser True o False.")
+        
         self._disponible = estado
-
+        logging.info(f"Servicio {self.id_entidad} disponibilidad cambiada a {estado}")
+        
     def _aplicar_ajustes_financieros(self, subtotal: float, impuesto: float = 0.0, descuento: float = 0.0) -> float:
         """
         Método auxiliar para procesar la sobrecarga de cálculo de costos.
@@ -217,6 +233,11 @@ class ServicioSala(Servicio):
         if not self.validar_parametros() or duracion <= 0:
             raise DatosInvalidosError("Parámetros o duración inválidos para calcular costo de Sala.")
         subtotal = self._tarifa_base * duracion
+
+        logging.info(
+            f"Cálculo Sala {self.id_entidad}: "
+            f"Duración={duracion}, subtotal={subtotal}")
+        
         return self._aplicar_ajustes_financieros(subtotal, impuesto, descuento)
 
     def describir_servicio(self) -> str:
@@ -250,7 +271,15 @@ class ServicioEquipo(Servicio):
         """Calcula el costo total según cantidad de equipos, días y ajustes opcionales."""
         if not self.validar_parametros() or duracion <= 0:
             raise DatosInvalidosError("Parámetros o duración inválidos para calcular costo de Equipos.")
+        
         subtotal = self._tarifa_base * self._cantidad * duracion
+
+        logging.info(
+            f"Cálculo Equipo {self.id_entidad}: "
+            f"cantidad = {self._cantidad}, "
+            f"duración = {duracion}, subtotal = {subtotal}"
+        )
+        
         return self._aplicar_ajustes_financieros(subtotal, impuesto, descuento)
 
     def describir_servicio(self) -> str:
@@ -356,12 +385,18 @@ class Reserva(EntidadGeneral):
         - Sin argumentos: calcula el costo neto.
         - Con impuesto y/o descuento: delega el cálculo polimórfico al servicio.
         """
-        return self._servicio.calcular_costo(
+        total = self._servicio.calcular_costo(
             duracion=self._duracion,
             impuesto=impuesto,
             descuento=descuento
         )
 
+        logging.info(f"Cotización Reserva {self.id_entidad}: "
+                     f"Total = {total}, IVA = {impuesto}%, Descuento = {descuento}%"
+        )
+
+        return total
+        
     def confirmar(self) -> str:
         """Cambia el estado de la reserva de 'Pendiente' a 'Confirmada'."""
         try:
