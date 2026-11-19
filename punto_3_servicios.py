@@ -462,3 +462,171 @@ class Reserva(EntidadGeneral):
             f"Servicio: {self._servicio.nombre_servicio} | Duración: {self._duracion} | "
             f"Estado: {self._estado} | Total: ${self._costo_final}"
         )
+# ==========================================================
+# 5. SIMULACIÓN DEL SISTEMA (10 OPERACIONES)
+# ==========================================================
+
+if __name__ == "__main__":
+
+    print("=" * 60)
+    print("SIMULACIÓN DEL SISTEMA SOFTWARE FJ")
+    print("=" * 60)
+
+    # --------------------------------------------------
+    # OPERACIÓN 1 - Cliente válido
+    # --------------------------------------------------
+    try:
+        cliente1 = Cliente("C001", "Carlos Perez", "carlos@gmail.com", "3124567890")
+        print("✓ Cliente creado:", cliente1.obtener_detalles())
+    except Exception as e:
+        print("✗ Error:", e)
+
+    # --------------------------------------------------
+    # OPERACIÓN 2 - Cliente inválido
+    # --------------------------------------------------
+    try:
+        cliente2 = Cliente("C002", "Al", "correo_malo", "123")
+        print(cliente2.obtener_detalles())
+    except Exception as e:
+        print("✓ Error controlado:", e)
+
+    # --------------------------------------------------
+    # OPERACIÓN 3 - Servicio Sala válido
+    # --------------------------------------------------
+    try:
+        sala1 = ServicioSala("S001", "Sala Innovacion", 20, 50000)
+        print("✓ Servicio creado:", sala1.obtener_detalles())
+    except Exception as e:
+        print("✗ Error:", e)
+
+    # --------------------------------------------------
+    # OPERACIÓN 4 - Servicio Sala inválido
+    # --------------------------------------------------
+    try:
+        sala_err = ServicioSala("S002", "Sala Pequeña", -5, 30000)
+        print(sala_err.obtener_detalles())
+    except Exception as e:
+        print("✓ Error controlado:", e)
+
+    # --------------------------------------------------
+    # OPERACIÓN 5 - Servicio Equipo válido
+    # --------------------------------------------------
+    try:
+        equipo1 = ServicioEquipo("E001", "Portatil", 5, 45000)
+        print("✓ Servicio creado:", equipo1.obtener_detalles())
+    except Exception as e:
+        print("✗ Error:", e)
+
+    # --------------------------------------------------
+    # OPERACIÓN 6 - Servicio Asesoría válido
+    # --------------------------------------------------
+    try:
+        asesoria1 = ServicioAsesoria(
+            "A001",
+            "Programacion Orientada a Objetos",
+            120000,
+            True
+        )
+
+        print("✓ Servicio creado:", asesoria1.obtener_detalles())
+
+    except Exception as e:
+        print("✗ Error:", e)
+
+    # --------------------------------------------------
+    # OPERACIÓN 7 - Reserva válida
+    # --------------------------------------------------
+    try:
+        reserva1 = Reserva("R001", cliente1, sala1, 4)
+        print("✓ Reserva creada")
+        print(reserva1.obtener_detalles())
+    except Exception as e:
+        print("✗ Error:", e)
+
+    # --------------------------------------------------
+    # OPERACIÓN 8 - Confirmar y procesar reserva
+    # --------------------------------------------------
+    try:
+        print(reserva1.confirmar())
+
+        total = reserva1.procesar(
+            impuesto=19,
+            descuento=10
+        )
+
+        print(f"✓ Total cobrado: ${total}")
+
+    except Exception as e:
+        print("✗ Error:", e)
+
+    # --------------------------------------------------
+    # OPERACIÓN 9 - Procesar sin confirmar
+    # --------------------------------------------------
+    try:
+        reserva2 = Reserva("R002", cliente1, equipo1, 2)
+
+        total = reserva2.procesar()
+
+        print(total)
+
+    except Exception as e:
+        print("✓ Error controlado:", e)
+
+    # --------------------------------------------------
+    # OPERACIÓN 10 - Servicio no disponible
+    # --------------------------------------------------
+    try:
+        asesoria1.disponible = False
+
+        reserva3 = Reserva(
+            "R003",
+            cliente1,
+            asesoria1,
+            1
+        )
+
+        print(reserva3.obtener_detalles())
+
+    except Exception as e:
+        print("✓ Error controlado:", e)
+
+    # --------------------------------------------------
+    # DEMOSTRACIÓN try/except/else
+    # --------------------------------------------------
+    print("\n--- Demostración try/except/else ---")
+
+    try:
+        cotizacion = sala1.calcular_costo(
+            duracion=2,
+            impuesto=19
+        )
+
+    except Exception as e:
+        print("Error:", e)
+
+    else:
+        print("Costo calculado correctamente:", cotizacion)
+
+    # --------------------------------------------------
+    # DEMOSTRACIÓN try/except/finally
+    # --------------------------------------------------
+    print("\n--- Demostración try/except/finally ---")
+
+    try:
+        reserva_cancelar = Reserva(
+            "R004",
+            cliente1,
+            equipo1,
+            1
+        )
+
+        print(reserva_cancelar.cancelar())
+
+    except Exception as e:
+        print("Error:", e)
+
+    finally:
+        print("Finalizó el bloque de cancelación.")
+
+    print("\nSimulación terminada.")
+    print("Revise el archivo: registro_software_fj.log")
