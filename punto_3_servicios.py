@@ -630,3 +630,196 @@ if __name__ == "__main__":
 
     print("\nSimulación terminada.")
     print("Revise el archivo: registro_software_fj.log")
+    
+    # ======================================================
+    # MODO INTERACTIVO PARA PRUEBAS MANUALES DEL EVALUADOR
+    # ======================================================
+
+    clientes = []
+    servicios = []
+
+    print("\n" + "=" * 60)
+    print("MODO INTERACTIVO DE PRUEBA")
+    print("El evaluador puede crear clientes y servicios propios")
+    print("=" * 60)
+
+    while True:
+
+        print("\nMENÚ PRINCIPAL")
+        print("1. Registrar cliente")
+        print("2. Crear servicio de sala")
+        print("3. Crear servicio de equipos")
+        print("4. Crear servicio de asesoría")
+        print("5. Crear reserva")
+        print("6. Salir")
+
+        opcion = input("Seleccione una opción: ")
+
+        # -----------------------------------------
+        # CLIENTE
+        # -----------------------------------------
+        if opcion == "1":
+
+            try:
+                id_cliente = input("ID Cliente: ")
+                nombre = input("Nombre: ")
+                correo = input("Correo: ")
+                telefono = input("Teléfono: ")
+
+                cliente = Cliente(
+                    id_cliente,
+                    nombre,
+                    correo,
+                    telefono
+                )
+
+                clientes.append(cliente)
+
+                print("\nCliente registrado correctamente")
+                print(cliente.obtener_detalles())
+
+            except Exception as e:
+                print("Error:", e)
+
+        # -----------------------------------------
+        # SALA
+        # -----------------------------------------
+        elif opcion == "2":
+
+            try:
+                id_servicio = input("ID Servicio: ")
+                nombre_sala = input("Nombre Sala: ")
+                capacidad = int(input("Capacidad: "))
+                tarifa = float(input("Tarifa por hora: "))
+
+                sala = ServicioSala(
+                    id_servicio,
+                    nombre_sala,
+                    capacidad,
+                    tarifa
+                )
+
+                servicios.append(sala)
+
+                print("\nServicio creado")
+                print(sala.obtener_detalles())
+
+            except Exception as e:
+                print("Error:", e)
+
+        # -----------------------------------------
+        # EQUIPOS
+        # -----------------------------------------
+        elif opcion == "3":
+
+            try:
+                id_servicio = input("ID Servicio: ")
+                tipo = input("Tipo de equipo: ")
+                cantidad = int(input("Cantidad: "))
+                tarifa = float(input("Tarifa por día: "))
+
+                equipo = ServicioEquipo(
+                    id_servicio,
+                    tipo,
+                    cantidad,
+                    tarifa
+                )
+
+                servicios.append(equipo)
+
+                print("\nServicio creado")
+                print(equipo.obtener_detalles())
+
+            except Exception as e:
+                print("Error:", e)
+
+        # -----------------------------------------
+        # ASESORÍA
+        # -----------------------------------------
+        elif opcion == "4":
+
+            try:
+                id_servicio = input("ID Servicio: ")
+                especialidad = input("Especialidad: ")
+                tarifa = float(input("Tarifa por sesión: "))
+
+                remoto = input("¿Es remota? (s/n): ").lower()
+
+                asesoria = ServicioAsesoria(
+                    id_servicio,
+                    especialidad,
+                    tarifa,
+                    remoto == "s"
+                )
+
+                servicios.append(asesoria)
+
+                print("\nServicio creado")
+                print(asesoria.obtener_detalles())
+
+            except Exception as e:
+                print("Error:", e)
+
+        # -----------------------------------------
+        # RESERVA
+        # -----------------------------------------
+        elif opcion == "5":
+
+            try:
+
+                if len(clientes) == 0:
+                    print("No existen clientes registrados.")
+                    continue
+
+                if len(servicios) == 0:
+                    print("No existen servicios registrados.")
+                    continue
+
+                print("\nCLIENTES DISPONIBLES")
+                for i, cliente in enumerate(clientes):
+                    print(i, "-", cliente.nombre)
+
+                indice_cliente = int(
+                    input("Seleccione cliente: ")
+                )
+
+                print("\nSERVICIOS DISPONIBLES")
+                for i, servicio in enumerate(servicios):
+                    print(i, "-", servicio.nombre_servicio)
+
+                indice_servicio = int(
+                    input("Seleccione servicio: ")
+                )
+
+                id_reserva = input("ID Reserva: ")
+                duracion = int(input("Duración: "))
+
+                reserva = Reserva(
+                    id_reserva,
+                    clientes[indice_cliente],
+                    servicios[indice_servicio],
+                    duracion
+                )
+
+                print(reserva.confirmar())
+
+                total = reserva.procesar()
+
+                print(f"Reserva procesada correctamente.")
+                print(f"Total cobrado: ${total}")
+
+            except Exception as e:
+                print("Error:", e)
+
+        # -----------------------------------------
+        # SALIR
+        # -----------------------------------------
+        elif opcion == "6":
+
+            print("Fin del sistema.")
+            break
+
+        else:
+            print("Opción no válida.")
+
+
