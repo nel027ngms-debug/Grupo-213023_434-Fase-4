@@ -631,9 +631,9 @@ if __name__ == "__main__":
     print("\nSimulación terminada.")
     print("Revise el archivo: registro_software_fj.log")
     
-    # ======================================================
-    # MODO INTERACTIVO PARA PRUEBAS MANUALES DEL EVALUADOR
-    # ======================================================
+    # ======================================
+    # MODO INTERACTIVO PARA PRUEBAS MANUALES 
+    # ======================================
 
     clientes = []
     servicios = []
